@@ -1,0 +1,11 @@
+#docker build from Dockerfile help by Lukas Pavelka
+
+Run this command:
+docker build -t dockerfiletraining .
+
+
+Once the build is complete and the image is created, run the docker:
+docker run -p 80:8080 dockerfiletraining
+
+
+Navigate to http://localhost:80 to see the changes
