@@ -6,6 +6,10 @@ MAINTAINER Lukas Pavelka "lukas.pavelka@gmail.com"
 
 USER root
 
+ENV http_proxy 'http://172.16.3.3:3128'
+ENV https_proxy 'http://172.16.3.3:3128'
+RUN apt-get update && apt-get install -y -q --no-install-recommends ca-certificates wget && apt-get clean 
+
 RUN apt-get update
 RUN apt-get install -y nginx nodejs
 
