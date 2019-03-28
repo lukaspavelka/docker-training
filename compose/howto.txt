@@ -1,0 +1,14 @@
+#edit Lukas Pavelka
+
+#INSTALATION:
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+#MAKE FILE EXACUTEBLE:
+chmod +x /usr/local/bin/docker-compose
+
+#create a symbolic link to /usr/bin or any other directory in your path.
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+#Test the installation.
+$ docker-compose --version
+docker-compose version 1.23.2, build 1110ad01
