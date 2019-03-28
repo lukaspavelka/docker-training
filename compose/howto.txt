@@ -14,3 +14,23 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 #Test the installation.
 $ docker-compose --version
 docker-compose version 1.23.2, build 1110ad01
+
+
+___________________________________________________________________________________________
+
+#SECOUD INSTALATION: Install Docker Compose
+
+
+$ sudo yum install epel-release
+Install python-pip
+
+$ sudo yum install -y python-pip
+Then install Docker Compose:
+
+$ sudo pip install docker-compose
+You will also need to upgrade your Python packages on CentOS 7 to get docker-compose to run successfully:
+
+$ sudo yum upgrade python*
+To verify a successful Docker Compose installation, run:
+
+$ docker-compose version
