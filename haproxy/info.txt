@@ -1,0 +1,21 @@
+docker run -d --name my-running-haproxy -p 8080:80 -v ~/haproxy:/usr/local/etc/haproxy:ro haproxy
+
+docker cp haproxy.cfg 06d5ad47eba0:/usr/local/etc/haproxy/haproxy.cfg
+alebo exec .... 
+
+If you want save the configuration, restart HAProxy in container:
+
+# systemctl restart haproxy
+
+
+Install 3x NginX on ports: 8081 8082 8083
+
+docker exec <CONTAINERID1> bash -c "echo 'this is 1 webserver' > /usr/share/nginx/html/index.html"
+docker exec <CONTAINERID2> bash -c "echo 'this is 2 webserver' > /usr/share/nginx/html/index.html"
+docker exec <CONTAINERID3> bash -c "echo 'this is 3 webserver' > /usr/share/nginx/html/index.html"
+
+
+
+Go to url in your browser to confirm the service of haproxy: http://load balancer’s IP Address/haproxy?stats. Example used here:
+
+http://10.13.211.194/haproxy?stats
