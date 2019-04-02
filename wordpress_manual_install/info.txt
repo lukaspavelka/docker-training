@@ -1,0 +1,65 @@
+How to Install WordPress with Docker on Ubuntu
+
+!Must be root!
+
+#check if you have mariadb image already 
+docker images
+
+#Download mariadb image
+docker pull mariadb
+
+#Before creating the new container, create a new directory for the WordPress data, database directory, and the WordPress code directory.
+mkdir ~/wordpress
+mkdir -p ~/wordpress/database
+mkdir -p ~/wordpress/html
+
+#Now create the new MariaDB container with name 'wordpressdb' with the command below:
+docker run -e MYSQL_ROOT_PASSWORD=aqwe123 -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wpuser321 -e MYSQL_DATABASE=wordpress_db -v /root/wordpress/database:/var/lib/mysql --name wordpressdb -d mariadb
+
+#Parameter explanation:
+#
+#    MYSQL_ROOT_PASSWORD = configure the password for the MySQL root user.
+#    MYSQL_USER = create a new MySQL user 'wpuser' for the WordPress database.
+#    MYSQL_PASSWORD = set the password 'wpuser@' for the user 'wpuser'.
+#    MYSQL_DATABASE = create a new database for the wordpress installation with name 'wordpress_db'.
+#    -v /root/wordpress/database:/varlib/mysql = linked database directory to the mysql directory '/var/lib/mysql' on the container to ensure data persistance.
+
+	
+# MariaDB container has been created, now check the new user and the database for the WordPress installation to ensure there is no error with command on top.
+docker inspect -f '{{ .NetworkSettings.IPAddress }}' wordpressdb
+
+#Next, connect to the wordpressdb container with mysql command from the host system:
+
+mysql -u wpuser -h 172.17.0.2 -p 
+TYPE PASSWORD: wpuser321
+
+#Check new database 'wordpress_db':
+show databases;
+
+
+########## Setup the Wordpress Container
+
+#download wordpress image
+docker pull wordpress:latest
+
+#run container for wordpress:
+docker run -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wpuser321 -e WORDPRESS_DB_NAME=wordpress_db -p 8081:80 -v /root/wordpress/html:/var/www/html --link wordpressdb:mysql --name wpcontainer -d wordpress
+
+#Parameters:
+#
+#    WORDPRESS_DB_USER = define database user 'wpuser' for the wordpress db.
+#    WORDPRESS_DB_PASSWORD = password 'wpuser@' for the database user 'wpuser'.
+#    WORDPRESS_DB_NAME = name of the database 'wordpress_db' created on step 2.
+#    -p 8081:80 = mapping the port 80 on the container to port 8081 on the host.
+#    -v /root/wordpress/html:/var/www/html = Linking the web root directory '/var/www/html' on the container to the local host directory 'wordpress/html'.
+#    --link wordpressdb:mysql = linking the mariadb container 'wordpressdb' to the new continer wordpress 'wpcontainer'.
+
+
+
+# To see the WordPress container running, you can check it with the curl command on the host IP and port 8081.
+
+
+
+
+
+
