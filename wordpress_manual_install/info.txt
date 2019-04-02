@@ -36,6 +36,9 @@ TYPE PASSWORD: wpuser321
 #Check new database 'wordpress_db':
 show databases;
 
+#Or use container adminer:
+docker run -d -p 80:8080 adminer
+
 
 ########## Setup the Wordpress Container
 
