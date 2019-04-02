@@ -1,18 +1,29 @@
-docker run -d --name my-running-haproxy -p 8080:80 -v ~/haproxy:/usr/local/etc/haproxy:ro haproxy
 
+Install 3x NginX on ports: 8081 8082 8083
+
+docker run --name=nginx1 -d -p 8081:80 nginx
+docker run --name=nginx2 -d -p 8081:80 nginx
+docker run --name=nginx3 -d -p 8081:80 nginx
+
+docker exec nginx1 bash -c "echo 'this is 1 webserver' > /usr/share/nginx/html/index.html"
+docker exec nginx2 bash -c "echo 'this is 2 webserver' > /usr/share/nginx/html/index.html"
+docker exec nginx3 bash -c "echo 'this is 3 webserver' > /usr/share/nginx/html/index.html"
+
+COPY CONF FILE:
+docker run -d --name my-running-haproxy -p 80:80 -v ~/haproxy:/usr/local/etc/haproxy:ro haproxy
+
+OR COPY AFTER... :
 docker cp haproxy.cfg 06d5ad47eba0:/usr/local/etc/haproxy/haproxy.cfg
-alebo exec .... 
+
+OR  exec in container and edit.... 
 
 If you want save the configuration, restart HAProxy in container:
 
 # systemctl restart haproxy
 
 
-Install 3x NginX on ports: 8081 8082 8083
 
-docker exec <CONTAINERID1> bash -c "echo 'this is 1 webserver' > /usr/share/nginx/html/index.html"
-docker exec <CONTAINERID2> bash -c "echo 'this is 2 webserver' > /usr/share/nginx/html/index.html"
-docker exec <CONTAINERID3> bash -c "echo 'this is 3 webserver' > /usr/share/nginx/html/index.html"
+
 
 
 
