@@ -10,6 +10,12 @@ docker exec nginx1 bash -c "echo 'this is 1 webserver' > /usr/share/nginx/html/i
 docker exec nginx2 bash -c "echo 'this is 2 webserver' > /usr/share/nginx/html/index.html"
 docker exec nginx3 bash -c "echo 'this is 3 webserver' > /usr/share/nginx/html/index.html"
 
+#mkdir folder for cfg file
+mkdir ~/haproxy
+
+#find ip address from containers nginx1 nginx2 nginx3 and add it to configure file...
+inspect ? :)
+
 #COPY CONF FILE:
 docker run -d --name my-running-haproxy -p 80:80 -v ~/haproxy:/usr/local/etc/haproxy:ro haproxy
 
