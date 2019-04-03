@@ -1,5 +1,6 @@
 #How to Install WordPress with Docker on Ubuntu
-# Maintained by Lukas Pavelka
+# MAINTAINER Lukas Pavelka <lukas.pavelka@gmail.com>
+
 # YOU !Must be root!
 
 #check if you have mariadb image already 
