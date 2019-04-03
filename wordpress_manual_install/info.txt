@@ -1,6 +1,6 @@
-How to Install WordPress with Docker on Ubuntu
-
-!Must be root!
+#How to Install WordPress with Docker on Ubuntu
+# Maintained by Lukas Pavelka
+# YOU !Must be root!
 
 #check if you have mariadb image already 
 docker images
