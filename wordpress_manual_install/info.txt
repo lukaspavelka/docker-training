@@ -29,8 +29,10 @@ docker run -e MYSQL_ROOT_PASSWORD=aqwe123 -e MYSQL_USER=wpuser -e MYSQL_PASSWORD
 # MariaDB container has been created, now check the new user and the database for the WordPress installation to ensure there is no error with command on top.
 docker inspect -f '{{ .NetworkSettings.IPAddress }}' wordpressdb
 
-#Next, connect to the wordpressdb container with mysql command from the host system:
+#Install mysql on hostOS for abble to connect on DB
+yum install mysql
 
+#Next, connect to the wordpressdb container with mysql command from the host system:
 mysql -u wpuser -h 172.17.0.2 -p 
 TYPE PASSWORD: wpuser321
 
@@ -61,9 +63,4 @@ docker run -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wpuser321 -e WOR
 
 
 # To see the WordPress container running, you can check it with the curl command on the host IP and port 8081.
-
-
-
-
-
-
+curl http://localhost:8081
