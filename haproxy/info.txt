@@ -2,8 +2,8 @@
 #Install 3x NginX on ports: 8081 8082 8083
 
 docker run --name=nginx1 -d -p 8081:80 nginx
-docker run --name=nginx2 -d -p 8081:80 nginx
-docker run --name=nginx3 -d -p 8081:80 nginx
+docker run --name=nginx2 -d -p 8082:80 nginx
+docker run --name=nginx3 -d -p 8083:80 nginx
 
 #change website on containers
 docker exec nginx1 bash -c "echo 'this is 1 webserver' > /usr/share/nginx/html/index.html"
