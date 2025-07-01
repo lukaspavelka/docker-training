@@ -1,0 +1,17 @@
+# Ignore version control files and directories
+.git
+.gitignore
+
+# Ignore Markdown files (documentation, etc.) if not needed in the image
+*.md
+
+# Ignore Python cache files and directories
+*.pyc
+*.pyo
+__pycache__
+
+# Ignore common virtual environment directories
+venv
+.venv
+env
+.env

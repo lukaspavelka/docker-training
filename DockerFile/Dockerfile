@@ -1,32 +1,42 @@
-#
-# Training Dockerfile
-#
-FROM ubuntu:latest
-MAINTAINER Lukas Pavelka "lukas.pavelka@gmail.com"
+# Specify a base image version for reproducibility
+FROM ubuntu:22.04
 
-USER root
+LABEL maintainer="Lukas Pavelka"
 
-ENV http_proxy 'http://172.16.3.3:3128'
-ENV https_proxy 'http://172.16.3.3:3128'
-RUN apt-get update && apt-get install -y -q --no-install-recommends ca-certificates wget && apt-get clean 
+# Combine RUN instructions to reduce layers
+# Use --no-install-recommends to minimize installed packages
+# Clean up apt cache to reduce image size
+# Install curl for potential healthchecks or other uses
+# Explicitly use python3 and pip3
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    nginx \
+    supervisor \
+    python3 \
+    python3-pip \
+    wget \
+    curl && \
+    pip3 install awscli && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update
-RUN apt-get install -y nginx
+# Copy configuration files
+# Assuming these paths are relative to the Docker build context (DockerFile directory)
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY sites-enabled/default /etc/nginx/sites-enabled/default
 
-# Remove the default Nginx configuration file
-RUN rm -v /etc/nginx/nginx.conf
+# Copy web content
+COPY html /usr/share/nginx/html
 
-# Copy a configuration file from the current directory
-ADD nginx.conf /etc/nginx/
+# Expose ports (good for documentation and for `docker run -P`)
+EXPOSE 80
+EXPOSE 443
 
-ADD web /usr/share/nginx/html/
+# Healthcheck to ensure Nginx is running (optional, but recommended)
+# This checks every 30 seconds if Nginx is responding on port 80.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl --fail http://localhost/ || exit 1
 
-# Append "daemon off;" to the beginning of the configuration
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-
-# Expose ports
-EXPOSE 8080
-
-# Set the default command to execute
-# when creating a new container
-CMD service nginx start
+# Start supervisord
+# Explicitly specify the configuration file for supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
