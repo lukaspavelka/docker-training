@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  webapp:
+    build:
+      context: ./webapp # Path to the Dockerfile for the webapp
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001" # Map host port 5001 to container port 5001 (where Gunicorn runs)
+    environment:
+      # These variables are used by app.py to connect to the database
+      - DB_HOST=db
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      # Flask/Gunicorn specific (optional, as defaults might work or be set in Dockerfile)
+      - FLASK_APP=app.py
+      - FLASK_ENV=development # Change to production for real deployments
+    depends_on:
+      db: # Ensures the 'db' service is started before 'webapp'
+        condition: service_healthy # Waits for the DB to be healthy (requires HEALTHCHECK in db service)
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine # Use official PostgreSQL image
+    environment:
+      # These environment variables are used by the PostgreSQL image to initialize the database
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist database data
+    ports:
+      - "5432:5432" # Optionally map PostgreSQL port to host for external access (e.g., pgAdmin)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+volumes:
+  postgres_data: # Defines a named volume for data persistence
+
+networks:
+  app-network: # Defines a custom bridge network
+    driver: bridge
