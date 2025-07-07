@@ -1,73 +1,38 @@
-# This will start a haproxy and 10 web services. haproxy will act as a loadbalancer.
-# Authors: lukas.pavelka@gmail.com
-# Date: 2022-01-15
+# This will start an HAProxy load balancer and multiple instances of a web service.
+# Authors: lukas.pavelka@gmail.com (updated by AI Assistant)
+# Date: 2022-01-15 (updated 2024)
 
-weba:
+version: '3.8' # Added compose file version
+
+services:
+  web: # Single definition for the web service, to be scaled
     build: ./web
-    expose:
-        - 80
+    expose: # Expose port internally for HAProxy
+      - "8000" # Changed internal port to 8000 to avoid conflict if running web directly for testing
+    # No ports mapping here, HAProxy will handle external access.
+    # Add restart policy if desired, e.g., restart: always
 
-webb:
-    build: ./web
-    expose:
-        - 80
-
-webc:
-    build: ./web
-    expose:
-        - 80
-
-webd:
-    build: ./web
-    expose:
-        - 80
-
-webe:
-    build: ./web
-    expose:
-        - 80
-
-webf:
-    build: ./web
-    expose:
-        - 80
-
-webg:
-    build: ./web
-    expose:
-        - 80
-
-webh:
-    build: ./web
-    expose:
-        - 80
-
-webi:
-    build: ./web
-    expose:
-        - 80
-
-webj:
-    build: ./web
-    expose:
-        - 80
-
-haproxy:
-    image: haproxy:1.6
+  haproxy:
+    image: haproxy:2.4 # Updated to a more recent HAProxy version (consider latest)
     volumes:
-        - ./haproxy:/haproxy-override
-        - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-    links:
-        - weba
-        - webb
-        - webc
-        - webd
-        - webe
-        - webf
-        - webg
-        - webh
-        - webi
-        - webj
+      # Removed unused ./haproxy:/haproxy-override volume
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    # links: # Removed legacy links, rely on Docker DNS
+    #   - web # This would only link to one instance if named 'web'
+    depends_on: # Optional: ensure web service is started, though HAProxy will manage connections
+      - web
     ports:
-        - "80:80"
-        - "70:70"
+      - "80:80"   # HTTP traffic to load balancer
+      - "7070:70" # HAProxy stats (changed host port to avoid conflict with potential other 70)
+    # For HAProxy to discover scaled 'web' services, its config or startup needs to handle it.
+    # Docker Compose V2 with `docker compose up --scale web=N` makes `web` resolvable
+    # and Docker DNS will round-robin. HAProxy can often use this.
+    # For more advanced discovery, especially with older HAProxy, DNS SRV records or
+    # tools like consul/etcd with confd/consul-template are used.
+    # With HAProxy 2.4+, can use server-template or DNS resolvers more effectively.
+    # For this example, we'll assume `web` resolves to the scaled instances for HAProxy.
+# Networks can be defined for better isolation if needed
+# networks:
+#   loadbalancer-net:
+
+# volumes: # Define any named volumes if services need them

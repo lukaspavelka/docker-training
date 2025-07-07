@@ -1,28 +1,36 @@
-version: '3.3'
+version: '3.8' # Updated version
 
 services:
    db:
      image: mysql:5.7
      volumes:
        - db_data:/var/lib/mysql
-     restart: always
+     restart: always # Or consider 'unless-stopped' for production
      environment:
-       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_ROOT_PASSWORD: somewordpress # Note: For example only, use secrets in production
        MYSQL_DATABASE: wordpress
        MYSQL_USER: wordpress
-       MYSQL_PASSWORD: wordpress
+       MYSQL_PASSWORD: wordpress # Note: For example only, use secrets in production
+     healthcheck: # Added healthcheck for MySQL
+       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+       interval: 10s
+       timeout: 5s
+       retries: 5
+       start_period: 30s # Give some time for MySQL to initialize
 
    wordpress:
      depends_on:
-       - db
-     image: wordpress:latest
+       db: # Modified depends_on to wait for db to be healthy
+         condition: service_healthy
+     image: wordpress:latest # Consider pinning to a specific version e.g., wordpress:6.0-php8.1-apache
      ports:
        - "8000:80"
-     restart: always
+     restart: always # Or consider 'unless-stopped'
      environment:
        WORDPRESS_DB_HOST: db:3306
        WORDPRESS_DB_USER: wordpress
        WORDPRESS_DB_PASSWORD: wordpress
-       WORDPRESS_DB_NAME: wordpress
-volumes:
+       WORDPRESS_DB_NAME: wordpress # This should match MYSQL_DATABASE on the db service
+
+volumes: # Defines the named volume for MySQL data
     db_data: {}

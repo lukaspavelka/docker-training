@@ -1,24 +1,24 @@
-version: '3'
-
+version: '3.8' # Updated version
 
 services:
-
   web:
-
-    image: nginx
-
+    image: nginx:alpine # Using alpine for a smaller image
     ports:
+      - "9090:80"
+    volumes:
+      - ./html:/usr/share/nginx/html # Mount the static HTML content
+    depends_on: # Optional: if web needed redis to be up first, though not used by this static page
+      - redis_service
 
-      - 9090:80
-
-  database:
-
-    image: redis
-
+  redis_service: # Renamed from 'database' for clarity, as Redis is not a traditional DB
+    image: redis:alpine # Using alpine for a smaller image
     ports:
-
-      - 6379-6389:6379
-
-
-
-
+      - "6379:6379" # Standard single port mapping for Redis
+      # The original 6379-6389:6379 is problematic for scaling if external access per instance is needed.
+      # See README for discussion on scaling and port conflicts.
+    # No volumes mounted for Redis by default, so data is ephemeral.
+    # Add a named volume if persistence is needed:
+    # volumes:
+    #   - redis_data:/data
+# volumes:
+#  redis_data: {}

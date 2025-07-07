@@ -1,25 +1,30 @@
 # ./docker-compose.yml
 
-version: '3'
+version: '3.8' # Updated version
 
 services:
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: my_secret_pw_shh
+      MYSQL_ROOT_PASSWORD: my_secret_pw_shh # Note: For example only, use secrets in production
       MYSQL_DATABASE: test_db
       MYSQL_USER: devuser
-      MYSQL_PASSWORD: devpass
+      MYSQL_PASSWORD: devpass # Note: For example only, use secrets in production
     ports:
       - "9906:3306"
+    volumes:
+      - db_data:/var/lib/mysql # Added named volume for data persistence
   web:
-    image: php:7.2.2-apache
-    container_name: php_web
+    image: php:7.2.2-apache # Consider updating PHP version in future
+    # container_name: php_web # Removed for better shareability
     depends_on:
       - db
     volumes:
       - ./php/:/var/www/html/
     ports:
       - "8100:80"
-    stdin_open: true
-    tty: true
+    # stdin_open: true # Removed, not typically needed for a web server
+    # tty: true # Removed, not typically needed for a web server
+
+volumes: # Define the named volume
+  db_data: {}

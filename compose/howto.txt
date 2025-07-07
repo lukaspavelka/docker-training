@@ -1,36 +1,126 @@
-#edit Lukas Pavelka
+# Docker Compose Installation and Basic Usage
+# Original content by Lukas Pavelka, updated by AI Assistant
 
-#Check actual version of compose on WEBSITE: https://docs.docker.com/compose/install/
+## Installing Docker Compose (V2 - Recommended)
 
-#INSTALATION:
-sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+Docker Compose V2 is included with **Docker Desktop** for Windows, macOS, and Linux.
+If you have Docker Desktop installed, you likely already have `docker compose` (note the space, not a hyphen).
 
-#MAKE FILE EXACUTEBLE:
-chmod +x /usr/local/bin/docker-compose
+**Verify V2 Installation:**
+```bash
+docker compose version
+```
+You should see output like "Docker Compose version v2.x.x".
 
-#create a symbolic link to /usr/bin or any other directory in your path.
-ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+**For Linux systems without Docker Desktop (Server Setups):**
 
-#Test the installation.
-$ docker-compose --version
-docker-compose version 1.23.2, build 1110ad01
+You can install the Docker Compose V2 plugin separately.
+1.  Follow the official Docker documentation to install the plugin. The exact commands can change, so always refer to the latest guide:
+    [https://docs.docker.com/compose/install/linux/](https://docs.docker.com/compose/install/linux/)
 
+    Generally, it involves downloading the plugin binary and placing it in a directory like `~/.docker/cli-plugins` or `/usr/local/lib/docker/cli-plugins`.
 
-___________________________________________________________________________________________
+    Example (check official docs for the latest URL and paths for your system):
+    ```bash
+    # Create the directory if it doesn't exist
+    mkdir -p ~/.docker/cli-plugins
+    # Download the plugin (replace LATEST_VERSION and architecture as needed)
+    curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+    # Apply executable permissions
+    chmod +x ~/.docker/cli-plugins/docker-compose
+    ```
 
-#SECOUD INSTALATION: Install Docker Compose
+2.  **Test the installation:**
+    ```bash
+    docker compose version
+    ```
 
+---
 
-$ sudo yum install epel-release
-Install python-pip
+## Using Docker Compose V1 (Legacy)
 
-$ sudo yum install -y python-pip
-Then install Docker Compose:
+Docker Compose V1 (`docker-compose` with a hyphen) is the older, standalone version. It is no longer actively developed and has been replaced by V2. **It is strongly recommended to use Docker Compose V2.**
 
-$ sudo pip install docker-compose
-You will also need to upgrade your Python packages on CentOS 7 to get docker-compose to run successfully:
+If you must use V1 (e.g., for very old projects or specific constraints):
+*   The installation methods previously listed in this file (using `curl` for a specific `1.23.2` version or `pip install docker-compose`) are for V1.
+*   Be aware that V1 may not support newer Docker features or Compose file syntaxes.
 
-$ sudo yum upgrade python*
-To verify a successful Docker Compose installation, run:
+---
 
-$ docker-compose version
+## Important Security Note for Examples
+
+**Never use default credentials, simple passwords, or hardcoded secrets from any example in a production environment.**
+
+The examples in this repository might use simplified passwords for ease of demonstration. In real-world applications:
+*   Use strong, unique passwords.
+*   Store sensitive information like API keys, database passwords, etc., using:
+    *   **Environment files (`.env`):** Docker Compose automatically loads variables from a `.env` file in the project directory. Reference them in your `docker-compose.yml` (e.g., `MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}`).
+    *   **Docker Secrets:** For Swarm mode, or for more secure management in general.
+    *   **Vaults or other secrets management tools.**
+
+---
+
+## Common Docker Compose Commands (V2 syntax)
+
+*   **Validate and view the effective configuration:**
+    ```bash
+    docker compose config
+    ```
+*   **Build or rebuild services:**
+    ```bash
+    docker compose build
+    docker compose build --no-cache <service_name>
+    ```
+*   **Create and start containers:**
+    ```bash
+    docker compose up
+    docker compose up -d # Detached mode
+    docker compose up --build # Build images before starting
+    docker compose up --scale <service_name>=<num_instances> # Scale a service
+    ```
+*   **List containers for the current project:**
+    ```bash
+    docker compose ps
+    ```
+*   **View logs from services:**
+    ```bash
+    docker compose logs
+    docker compose logs -f <service_name> # Follow logs
+    ```
+*   **Stop services:**
+    ```bash
+    docker compose stop # Stops running containers without removing them
+    ```
+*   **Stop and remove containers, networks, volumes, and images created by `up`:**
+    ```bash
+    docker compose down
+    docker compose down -v # Also remove named volumes
+    ```
+*   **Execute a command in a running service container:**
+    ```bash
+    docker compose exec <service_name> <command>
+    # e.g., docker compose exec web sh
+    ```
+*   **Run a one-off command on a service:**
+    ```bash
+    docker compose run <service_name> <command>
+    ```
+*   **List images used by the configuration:**
+    ```bash
+    docker compose images
+    ```
+*   **Pause and unpause services:**
+    ```bash
+    docker compose pause <service_name>
+    docker compose unpause <service_name>
+    ```
+*   **Kill services:**
+    ```bash
+    docker compose kill <service_name>
+    ```
+*   **Display real-time events from services:**
+    ```bash
+    docker compose events
+    ```
+
+Always refer to the official Docker Compose documentation for the most up-to-date commands and features.
